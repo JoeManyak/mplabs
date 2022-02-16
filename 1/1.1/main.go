@@ -3,11 +3,12 @@ package main
 import (
 	"bufio"
 	"os"
-	"strings"
 )
 
+const div = 'a' - 'A'
+
 func main() {
-	file, err := os.Open("./1/1.1/input.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -20,6 +21,8 @@ func main() {
 	var words []string
 	var row = 0
 	var rowCount = 0
+
+	//as far as I know, in golang no other way to read line by line, so i used scanner
 	scanner := bufio.NewScanner(file)
 
 Scanner:
@@ -44,7 +47,7 @@ WordChecker:
 	}
 
 	if i == symbols-1 {
-		words = append(words, strings.ToLower(rows[row][breaker:symbols]))
+		words = append(words, rows[row][breaker:symbols])
 		breaker = i + 1
 		i++
 		if i >= symbols {
@@ -53,7 +56,7 @@ WordChecker:
 		}
 	}
 	if rows[row][i] == ' ' {
-		words = append(words, strings.ToLower(rows[row][breaker:i]))
+		words = append(words, rows[row][breaker:i])
 		breaker = i + 1
 		i++
 	}
@@ -64,9 +67,40 @@ CountWords:
 	var uniqueCount []int
 	var countedLen = 0
 	var wordLen = len(words)
+	var thisWord string
+	var j = 0
+	i = 0
+FixWords:
+	if i == wordLen {
+		goto StartCounting
+	}
+	thisWord = words[i]
+FixWord:
+	if j >= len(words[i]) {
+		i++
+		j = 0
+		goto FixWords
+	}
+	if thisWord[j] > 'A' && thisWord[j] < 'Z' {
+		words[i] = words[i][:j] + string(words[i][j]+div)
+		if j != len(words[i]) {
+			words[i] += thisWord[j+1:]
+		}
+		thisWord = words[i]
+	}
+	if thisWord[j] < 'a' || thisWord[j] > 'z' {
+		words[i] = thisWord[:j]
+		if j != len(words[i]) {
+			words[i] += thisWord[j+1:]
+		}
+	}
+	thisWord = words[i]
+	j++
+	goto FixWord
+
+StartCounting:
 	var k = 0
 	var currentWord = 0
-	var j = 0
 WordCountCycle:
 	if currentWord >= wordLen {
 		goto SORT
