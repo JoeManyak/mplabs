@@ -22,7 +22,7 @@ func main() {
 	var row = 0
 	var rowCount = 0
 
-	//as far as I know, in golang no other way to read line by line, so i used scanner
+	//as far as I know, in golang no other way to read line by line, so I used scanner
 	scanner := bufio.NewScanner(file)
 
 Scanner:
@@ -93,6 +93,7 @@ FixWord:
 		if j != len(words[i]) {
 			words[i] += thisWord[j+1:]
 		}
+		j--
 	}
 	thisWord = words[i]
 	j++
@@ -128,10 +129,12 @@ ForbiddenChecker:
 	if k != forbiddenCount {
 		goto ForbiddenChecker
 	}
-	uniqueWords = append(uniqueWords, words[currentWord])
-	uniqueCount = append(uniqueCount, 1)
+	if words[currentWord] != "" {
+		uniqueWords = append(uniqueWords, words[currentWord])
+		uniqueCount = append(uniqueCount, 1)
+		countedLen++
+	}
 	currentWord++
-	countedLen++
 	j = 0
 	goto WordCountCycle
 
@@ -159,6 +162,7 @@ END:
 	i = 0
 OUT:
 	if i == countedLen {
+		println("-")
 		return
 	}
 	println(uniqueWords[i], ":", uniqueCount[i])
