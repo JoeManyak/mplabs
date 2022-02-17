@@ -88,9 +88,11 @@ FixWord:
 		}
 		thisWord = words[i]
 	}
-	if thisWord[j] < 'a' || thisWord[j] > 'z' {
+	//getting symbols
+	if (thisWord[j] < 'a' || thisWord[j] > 'z') && !(thisWord[j] == '\'' || thisWord[j] == '-' ||
+		(thisWord[j] >= '0' && thisWord[j] <= '9')) {
 		words[i] = thisWord[:j]
-		if j != len(words[i]) {
+		if j != len(thisWord) {
 			words[i] += thisWord[j+1:]
 		}
 		j--
@@ -162,7 +164,6 @@ END:
 	i = 0
 OUT:
 	if i == countedLen {
-		println("-")
 		return
 	}
 	println(uniqueWords[i], ":", uniqueCount[i])
