@@ -9,7 +9,7 @@ const div = 'a' - 'A'
 const pageSize = 15
 
 func main() {
-	file, err := os.Open("input.txt")
+	file, err := os.Open("./1/1.2/input.txt")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -73,7 +73,8 @@ WordChecker:
 	goto WordChecker
 CountWords:
 	var uniqueWords []string
-	var uniqueCount [][]int
+	var uniquePages [][]int
+	var uniqueCount []int
 	var countedLen = 0
 	var wordLen = len(words)
 	var thisWord string
@@ -122,14 +123,16 @@ WordCountCycle:
 	if uniqueWords[j] == words[currentWord] {
 		var z = 0
 	uniqueWordChecker:
-		if wordsPage[currentWord] == uniqueCount[j][z] {
+		if wordsPage[currentWord] == uniquePages[j][z] {
+			uniqueCount[j]++
 			goto Skip
 		}
 		z++
-		if z != len(uniqueCount[j]) {
+		if z != len(uniquePages[j]) {
 			goto uniqueWordChecker
 		}
-		uniqueCount[j] = append(uniqueCount[j], wordsPage[currentWord])
+		uniqueCount[j]++
+		uniquePages[j] = append(uniquePages[j], wordsPage[currentWord])
 	Skip:
 		currentWord++
 		j = 0
@@ -138,9 +141,10 @@ WordCountCycle:
 	j++
 	goto WordCountCycle
 ADD:
-	if /*words[currentWord] != "" || */ len(words[currentWord]) > 1 {
+	if len(words[currentWord]) > 1 {
 		uniqueWords = append(uniqueWords, words[currentWord])
-		uniqueCount = append(uniqueCount, []int{wordsPage[currentWord]})
+		uniquePages = append(uniquePages, []int{wordsPage[currentWord]})
+		uniqueCount = append(uniqueCount, 1)
 		countedLen++
 	}
 	currentWord++
@@ -160,13 +164,20 @@ SortJ:
 		goto SortI
 	}
 SortZ:
-	if z >= len(uniqueWords[j]) || z >= len(uniqueWords[j+1]) {
+	if z >= len(uniqueWords[j]) {
 		z = 0
 		j++
 		goto SortJ
 	}
+	if z >= len(uniqueWords[j+1]) {
+		uniquePages[j], uniquePages[j+1] = uniquePages[j+1], uniquePages[j]
+		uniqueWords[j], uniqueWords[j+1] = uniqueWords[j+1], uniqueWords[j]
+		j++
+		z = 0
+		goto SortJ
+	}
 	if uniqueWords[j][z] > uniqueWords[j+1][z] {
-		uniqueCount[j], uniqueCount[j+1] = uniqueCount[j+1], uniqueCount[j]
+		uniquePages[j], uniquePages[j+1] = uniquePages[j+1], uniquePages[j]
 		uniqueWords[j], uniqueWords[j+1] = uniqueWords[j+1], uniqueWords[j]
 	}
 	if uniqueWords[j][z] == uniqueWords[j+1][z] {
@@ -182,17 +193,21 @@ OUT:
 	if i == countedLen {
 		return
 	}
+	if uniqueCount[i] > 100 {
+		i++
+		goto OUT
+	}
 	print(uniqueWords[i] + ": ")
 	var k = 0
 FormatString:
-	if k == len(uniqueCount[i]) {
+	if k == len(uniquePages[i]) {
 		k = 0
 		i++
 		goto OUT
 	}
-	print(uniqueCount[i][k])
+	print(uniquePages[i][k])
 	k++
-	if k < len(uniqueCount[i]) {
+	if k < len(uniquePages[i]) {
 		print(",")
 	} else {
 		println(";")
