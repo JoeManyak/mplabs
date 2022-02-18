@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"os"
+	"strconv"
 )
 
-const div = 'a' - 'A'
-const pageSize = 15
+const div2 = 'a' - 'A'
+const pageSize = 45
 
 func main() {
-	file, err := os.Open("./1/1.2/input.txt")
+	file, err := os.Open("input.txt")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -17,7 +18,7 @@ func main() {
 	var rows []string
 	var words []string
 	var wordsPage []int
-	var page = 0
+	var page = 1
 	var row = 0
 	var rowCount = 0
 
@@ -74,7 +75,6 @@ WordChecker:
 CountWords:
 	var uniqueWords []string
 	var uniquePages [][]int
-	var uniqueCount []int
 	var countedLen = 0
 	var wordLen = len(words)
 	var thisWord string
@@ -91,11 +91,9 @@ FixWord:
 		j = 0
 		goto FixWords
 	}
-	if thisWord == "“AAAAAAAAAARGH!”" {
-		println("-")
-	}
+
 	if thisWord[j] >= 'A' && thisWord[j] <= 'Z' {
-		words[i] = words[i][:j] + string(words[i][j]+div)
+		words[i] = words[i][:j] + string(words[i][j]+div2)
 		if j != len(words[i]) {
 			words[i] += thisWord[j+1:]
 		}
@@ -127,14 +125,12 @@ WordCountCycle:
 		var z = 0
 	uniqueWordChecker:
 		if wordsPage[currentWord] == uniquePages[j][z] {
-			uniqueCount[j]++
 			goto Skip
 		}
 		z++
 		if z != len(uniquePages[j]) {
 			goto uniqueWordChecker
 		}
-		uniqueCount[j]++
 		uniquePages[j] = append(uniquePages[j], wordsPage[currentWord])
 	Skip:
 		currentWord++
@@ -144,10 +140,10 @@ WordCountCycle:
 	j++
 	goto WordCountCycle
 ADD:
+	//not count word lesser than 2 symbols
 	if len(words[currentWord]) > 1 {
 		uniqueWords = append(uniqueWords, words[currentWord])
 		uniquePages = append(uniquePages, []int{wordsPage[currentWord]})
-		uniqueCount = append(uniqueCount, 1)
 		countedLen++
 	}
 	currentWord++
@@ -191,25 +187,25 @@ SortZ:
 	z = 0
 	goto SortJ
 END:
+	output, err := os.Create("output.txt")
+	if err != nil {
+		panic(err)
+	}
 	i = 0
 OUT:
 	if i == countedLen {
-		/*		f, _ := os.Create("result.txt")
-				defer f.Close()
-				for i := range uniqueWords {
-					f.Write([]byte(uniqueWords[i] + ": "))
-					for j := range uniquePages[i] {
-						f.Write([]byte(strconv.Itoa(uniquePages[i][j]) + ", "))
-					}
-					f.Write([]byte("\n"))
-				}*/
 		return
 	}
-	if uniqueCount[i] > 100 {
+
+	if len(uniquePages[i]) > 100 {
 		i++
 		goto OUT
 	}
-	print(uniqueWords[i] + ": ")
+	_, err = output.Write([]byte(uniqueWords[i] + ": "))
+	if err != nil {
+		panic(err)
+	}
+	//print(uniqueWords[i] + ": ")
 	var k = 0
 FormatString:
 	if k == len(uniquePages[i]) {
@@ -217,12 +213,24 @@ FormatString:
 		i++
 		goto OUT
 	}
-	print(uniquePages[i][k])
+	//print(uniquePages[i][k])
+	_, err = output.Write([]byte(strconv.Itoa(uniquePages[i][k])))
+	if err != nil {
+		panic(err)
+	}
 	k++
 	if k < len(uniquePages[i]) {
-		print(",")
+		_, err = output.Write([]byte(", "))
+		if err != nil {
+			panic(err)
+		}
+		//print(", ")
 	} else {
-		println(";")
+		_, err = output.Write([]byte(";\n"))
+		if err != nil {
+			panic(err)
+		}
+		//println(";")
 	}
 	goto FormatString
 

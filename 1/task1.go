@@ -3,9 +3,10 @@ package main
 import (
 	"bufio"
 	"os"
+	"strconv"
 )
 
-const div = 'a' - 'A'
+const div1 = 'a' - 'A'
 
 func main() {
 	file, err := os.Open("input.txt")
@@ -81,8 +82,8 @@ FixWord:
 		j = 0
 		goto FixWords
 	}
-	if thisWord[j] > 'A' && thisWord[j] < 'Z' {
-		words[i] = words[i][:j] + string(words[i][j]+div)
+	if thisWord[j] >= 'A' && thisWord[j] <= 'Z' {
+		words[i] = words[i][:j] + string(words[i][j]+div1)
 		if j != len(words[i]) {
 			words[i] += thisWord[j+1:]
 		}
@@ -106,7 +107,7 @@ StartCounting:
 	var currentWord = 0
 WordCountCycle:
 	if currentWord >= wordLen {
-		goto SORT
+		goto Sort
 	}
 	if j >= countedLen {
 		goto ADD
@@ -131,7 +132,8 @@ ForbiddenChecker:
 	if k != forbiddenCount {
 		goto ForbiddenChecker
 	}
-	if words[currentWord] != "" {
+	//not count word lesser than 2 symbols
+	if len(words[currentWord]) > 1 {
 		uniqueWords = append(uniqueWords, words[currentWord])
 		uniqueCount = append(uniqueCount, 1)
 		countedLen++
@@ -140,7 +142,7 @@ ForbiddenChecker:
 	j = 0
 	goto WordCountCycle
 
-SORT:
+Sort:
 	i = -1
 	j = 0
 SortI:
@@ -161,12 +163,24 @@ SortJ:
 	j++
 	goto SortJ
 END:
+	output, err := os.Create("output.txt")
+	if err != nil {
+		panic(err)
+	}
 	i = 0
 OUT:
 	if i == countedLen {
+		err = output.Close()
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
-	println(uniqueWords[i], ":", uniqueCount[i])
+	_, err = output.Write([]byte(uniqueWords[i] + ": " + strconv.Itoa(uniqueCount[i]) + "\n"))
+	if err != nil {
+		panic(err)
+	}
+	//println(uniqueWords[i], ":", uniqueCount[i])
 	i++
 	goto OUT
 }
