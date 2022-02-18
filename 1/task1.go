@@ -7,6 +7,7 @@ import (
 )
 
 const div1 = 'a' - 'A'
+const N = 25
 
 func main() {
 	file, err := os.Open("input.txt")
@@ -180,7 +181,9 @@ OUT:
 	if err != nil {
 		panic(err)
 	}
-	//println(uniqueWords[i], ":", uniqueCount[i])
+	if i < N {
+		println(uniqueWords[i], ":", uniqueCount[i])
+	}
 	i++
 	goto OUT
 }
