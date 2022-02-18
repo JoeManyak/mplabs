@@ -91,7 +91,10 @@ FixWord:
 		j = 0
 		goto FixWords
 	}
-	if thisWord[j] > 'A' && thisWord[j] < 'Z' {
+	if thisWord == "“AAAAAAAAAARGH!”" {
+		println("-")
+	}
+	if thisWord[j] >= 'A' && thisWord[j] <= 'Z' {
 		words[i] = words[i][:j] + string(words[i][j]+div)
 		if j != len(words[i]) {
 			words[i] += thisWord[j+1:]
@@ -191,6 +194,15 @@ END:
 	i = 0
 OUT:
 	if i == countedLen {
+		/*		f, _ := os.Create("result.txt")
+				defer f.Close()
+				for i := range uniqueWords {
+					f.Write([]byte(uniqueWords[i] + ": "))
+					for j := range uniquePages[i] {
+						f.Write([]byte(strconv.Itoa(uniquePages[i][j]) + ", "))
+					}
+					f.Write([]byte("\n"))
+				}*/
 		return
 	}
 	if uniqueCount[i] > 100 {
